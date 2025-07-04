@@ -1,0 +1,36 @@
+{
+  "name": "@karthicraja/react-native-simple-table",
+  "version": "1.0.1",
+  "description": "A customizable table component for React Native.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Karthicrajamo/NPM_Table_Component.git"
+  },
+  "keywords": [
+    "react-native",
+    "table",
+    "component"
+  ],
+  "author": "Karthic Raja",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Karthicrajamo/NPM_Table_Component/issues"
+  },
+  "homepage": "https://github.com/Karthicrajamo/NPM_Table_Component#readme",
+  "dependencies": {
+    "react": ">=16.8",
+    "react-native": ">=0.60",
+    "react-native-paper": ">=5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-native": "^0.72.8",
+    "typescript": "^5.8.3"
+  }
+}

@@ -20,14 +20,14 @@ A clean, customizable table component for React Native.
 ## 📦 Installation
 
 ```bash
-npm install react-native-simple-table
+npm install @karthicraja/react-native-simple-table
 ```
 
 4️⃣ **Full example in a component:**
 
 ```tsx
 import React from "react";
-import { SimpleTable } from "react-native-simple-table";
+import { SimpleTable } from "@karthicraja/react-native-simple-table";
 
 export default function MyScreen() {
   return (

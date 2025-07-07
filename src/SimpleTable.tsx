@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Checkbox } from "react-native-paper";
+import commonStyles from "./commonStyles"; // ✅ make sure to put commonStyles.ts in the same folder
 
 const { width } = Dimensions.get("window");
 const isMobile = width < 768;
@@ -24,11 +25,11 @@ export interface SimpleTableProps {
   checkboxHeaders?: string[];
 }
 
-const SimpleTable: React.FC<SimpleTableProps> = ({
+export const SimpleTable: React.FC<SimpleTableProps> = ({
   headers,
   tableData,
   highlightVal = [],
-  heading,
+  heading = "",
   exclude = [],
   tableDataContainerStyle,
   setActive,
@@ -36,12 +37,14 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
 }) => {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
-  const filteredHeaders = headers.filter((h) => !exclude.includes(h));
+  const filteredHeaders = headers.filter((header) => !exclude.includes(header));
   const filteredIndexes = headers
-    .map((h, i) => (!exclude.includes(h) ? i : -1))
+    .map((header, i) => (!exclude.includes(header) ? i : -1))
     .filter((i) => i !== -1);
 
-  const columnWidths = filteredHeaders.map((h) => Math.max(h.length * 10, 120));
+  const columnWidths = filteredHeaders.map((header) =>
+    Math.max(header.length * 10, 120)
+  );
 
   const getCellStyle = (header: string) =>
     highlightVal.includes(header)
@@ -69,18 +72,18 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
   const renderRows = () =>
     tableData.length > 0 ? (
       tableData.map((row, rowIndex) => {
-        const isSelected = rowIndex === selectedRowIndex;
-
-        const orderedData: Record<string, any> = {};
+        const rowData: Record<string, any> = {};
         headers.forEach((header, i) => {
-          orderedData[header] = row[i];
+          rowData[header] = row[i];
         });
+
+        const isSelected = rowIndex === selectedRowIndex;
 
         const rowContent = (
           <View
             style={[
               styles.dataRow,
-              isSelected && setActive ? styles.selectedRow : {},
+              isSelected && setActive ? styles.selectedRow : undefined,
             ]}
           >
             {filteredIndexes.map((colIndex, i) => {
@@ -100,7 +103,7 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
               const shouldRenderCheckbox =
                 checkboxHeaders.length > 0
                   ? checkboxHeaders.includes(header)
-                  : false;
+                  : colIndex === filteredIndexes[filteredIndexes.length - 1];
 
               return (
                 <View
@@ -118,10 +121,13 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
                     />
                   ) : (
                     <Text
-                      style={[getCellStyle(header), { width: columnWidths[i] }]}
+                      style={[
+                        getCellStyle(header),
+                        { width: columnWidths[i], color: "black" },
+                      ]}
                       maxFontSizeMultiplier={1.2}
                     >
-                      {String(value)}
+                      {value}
                     </Text>
                   )}
                 </View>
@@ -131,10 +137,10 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
         );
 
         if (setActive) {
-          const filteredData: Record<string, any> = {};
+          const orderedData: Record<string, any> = {};
           filteredHeaders.forEach((header, i) => {
-            const idx = headers.indexOf(header);
-            filteredData[header] = row[idx];
+            const colIndex = headers.indexOf(header);
+            orderedData[header] = row[colIndex];
           });
 
           return (
@@ -142,14 +148,15 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
               key={`row-${rowIndex}`}
               onPress={() => {
                 setSelectedRowIndex(rowIndex);
-                setActive(filteredData);
+                setActive(orderedData);
               }}
             >
               {rowContent}
             </TouchableOpacity>
           );
+        } else {
+          return <View key={`row-${rowIndex}`}>{rowContent}</View>;
         }
-        return <View key={`row-${rowIndex}`}>{rowContent}</View>;
       })
     ) : (
       <View style={styles.dataRow}>
@@ -165,10 +172,11 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
   return (
     <View style={styles.container}>
       {heading ? (
-        <Text style={styles.heading} maxFontSizeMultiplier={1.2}>
+        <Text style={commonStyles.heading} maxFontSizeMultiplier={1.2}>
           {heading}
         </Text>
       ) : null}
+
       <ScrollView horizontal persistentScrollbar showsHorizontalScrollIndicator>
         <View style={styles.tableContainer}>
           {renderHeader()}
@@ -188,13 +196,9 @@ const SimpleTable: React.FC<SimpleTableProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f5f5f5",
     padding: 2,
     paddingHorizontal: 10,
-  },
-  heading: {
-    fontSize: isMobile ? 16 : 18,
-    fontWeight: "bold",
-    marginBottom: 8,
   },
   tableContainer: {
     width: "100%",
@@ -203,9 +207,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
   },
+  scrollableBody: {
+    maxHeight: 250,
+  },
   headerRow: {
     flexDirection: "row",
     backgroundColor: "#3788E5",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#fff",
   },
   headerCell: {
     paddingVertical: 10,
@@ -224,17 +235,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#D6E9FF",
   },
   dataCell: {
+    color: "black",
     padding: 10,
     fontSize: isMobile ? 14 : 16,
     textAlign: "center",
+    borderRightColor: "#ddd",
   },
   highlightCell: {
     color: "blue",
     fontWeight: "bold",
-  },
-  noDataCell: {
-    width: "100%",
-    textAlign: "center",
   },
   cellContainer: {
     justifyContent: "center",
@@ -242,8 +251,9 @@ const styles = StyleSheet.create({
     borderRightWidth: 1.5,
     borderRightColor: "#ddd",
   },
-  scrollableBody: {
-    maxHeight: 250,
+  noDataCell: {
+    width: "100%",
+    textAlign: "center",
   },
 });
 

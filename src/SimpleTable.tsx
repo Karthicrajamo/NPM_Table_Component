@@ -6,10 +6,11 @@ import {
   Dimensions,
   StyleProp,
   ViewStyle,
+  TextStyle,
   TouchableOpacity,
 } from "react-native";
 import { Text, Checkbox } from "react-native-paper";
-import commonStyles from "./commonStyles"; // ✅ make sure to put commonStyles.ts in the same folder
+import commonStyles from "./commonStyles"; // ✅ your common heading style
 
 const { width } = Dimensions.get("window");
 const isMobile = width < 768;
@@ -23,6 +24,18 @@ export interface SimpleTableProps {
   tableDataContainerStyle?: StyleProp<ViewStyle>;
   setActive?: (data: Record<string, any>) => void;
   checkboxHeaders?: string[];
+  customStyles?: {
+    container?: StyleProp<ViewStyle>;
+    tableContainer?: StyleProp<ViewStyle>;
+    headerRow?: StyleProp<ViewStyle>;
+    headerCell?: StyleProp<TextStyle>;
+    dataRow?: StyleProp<ViewStyle>;
+    selectedRow?: StyleProp<ViewStyle>;
+    dataCell?: StyleProp<TextStyle>;
+    highlightCell?: StyleProp<TextStyle>;
+    cellContainer?: StyleProp<ViewStyle>;
+    noDataCell?: StyleProp<TextStyle>;
+  };
 }
 
 export const SimpleTable: React.FC<SimpleTableProps> = ({
@@ -34,6 +47,7 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
   tableDataContainerStyle,
   setActive,
   checkboxHeaders = [],
+  customStyles = {},
 }) => {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
@@ -48,18 +62,31 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
 
   const getCellStyle = (header: string) =>
     highlightVal.includes(header)
-      ? [styles.dataCell, styles.highlightCell]
-      : styles.dataCell;
+      ? [
+          styles.dataCell,
+          customStyles.dataCell,
+          styles.highlightCell,
+          customStyles.highlightCell,
+        ]
+      : [styles.dataCell, customStyles.dataCell];
 
   const renderHeader = () => (
-    <View style={styles.headerRow}>
+    <View style={[styles.headerRow, customStyles.headerRow]}>
       {filteredHeaders.map((header, index) => (
         <View
           key={`header-${header}-${index}`}
-          style={[styles.cellContainer, { width: columnWidths[index] }]}
+          style={[
+            styles.cellContainer,
+            { width: columnWidths[index] },
+            customStyles.cellContainer,
+          ]}
         >
           <Text
-            style={[styles.headerCell, { width: columnWidths[index] }]}
+            style={[
+              styles.headerCell,
+              customStyles.headerCell,
+              { width: columnWidths[index] },
+            ]}
             maxFontSizeMultiplier={1.2}
           >
             {header}
@@ -83,7 +110,8 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
           <View
             style={[
               styles.dataRow,
-              isSelected && setActive ? styles.selectedRow : undefined,
+              customStyles.dataRow,
+              isSelected && setActive ? [styles.selectedRow, customStyles.selectedRow] : {},
             ]}
           >
             {filteredIndexes.map((colIndex, i) => {
@@ -108,7 +136,11 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
               return (
                 <View
                   key={`cell-${rowIndex}-${i}`}
-                  style={[styles.cellContainer, { width: columnWidths[i] }]}
+                  style={[
+                    styles.cellContainer,
+                    { width: columnWidths[i] },
+                    customStyles.cellContainer,
+                  ]}
                 >
                   {isBooleanLike && shouldRenderCheckbox ? (
                     <Checkbox
@@ -123,7 +155,7 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
                     <Text
                       style={[
                         getCellStyle(header),
-                        { width: columnWidths[i], color: "black" },
+                        { width: columnWidths[i] },
                       ]}
                       maxFontSizeMultiplier={1.2}
                     >
@@ -159,9 +191,13 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
         }
       })
     ) : (
-      <View style={styles.dataRow}>
+      <View style={[styles.dataRow, customStyles.dataRow]}>
         <Text
-          style={[styles.dataCell, styles.noDataCell]}
+          style={[
+            styles.dataCell,
+            styles.noDataCell,
+            customStyles.noDataCell,
+          ]}
           maxFontSizeMultiplier={1.2}
         >
           No data available
@@ -170,7 +206,7 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
     );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, customStyles.container]}>
       {heading ? (
         <Text style={commonStyles.heading} maxFontSizeMultiplier={1.2}>
           {heading}
@@ -178,7 +214,7 @@ export const SimpleTable: React.FC<SimpleTableProps> = ({
       ) : null}
 
       <ScrollView horizontal persistentScrollbar showsHorizontalScrollIndicator>
-        <View style={styles.tableContainer}>
+        <View style={[styles.tableContainer, customStyles.tableContainer]}>
           {renderHeader()}
           <ScrollView
             style={[styles.scrollableBody, tableDataContainerStyle]}
